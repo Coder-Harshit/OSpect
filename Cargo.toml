@@ -2,8 +2,10 @@
 name = "ospect"
 version = "0.1.0"
 edition = "2021"
+authors = ["HARSHIT VIJAY"]
 
 [dependencies]
 colored = "2.0"
 sysinfo = "0.23"
 whoami = "0.9"
+clap = { version = "4.5", features = ["derive"] }
