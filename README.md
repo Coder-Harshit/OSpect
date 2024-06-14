@@ -22,7 +22,7 @@ To simplify the installation process, you can use the provided `install_ospect.s
 
 1. **Download and Run the Script**:
    ```sh
-   curl -O https://raw.githubusercontent.com/yourusername/OSpect/main/install_ospect.sh
+   curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/install_ospect.sh
    chmod +x install_ospect.sh
    ./install_ospect.sh
    ```
@@ -35,7 +35,7 @@ If you prefer to manually install OSpect, follow these steps:
 
 2. **Clone the Repository**:
    ```sh
-   git clone https://github.com/yourusername/OSpect.git
+   git clone https://github.com/Coder-Harshit/OSpect.git
    cd OSpect
    ```
 
@@ -103,7 +103,7 @@ We welcome contributions from the community! If you'd like to contribute to OSpe
 
 2. **Clone Your Fork**:
    ```sh
-   git clone https://github.com/yourusername/OSpect.git
+   git clone https://github.com/Coder-Harshit/OSpect.git
    cd OSpect
    ```
 
