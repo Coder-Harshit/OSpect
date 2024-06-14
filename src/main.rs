@@ -11,6 +11,7 @@ fn main() {
 
     let matches = Command::new("ospect")
     .about("OSpect: Comprehensive System Insights utility tool")
+    .version("0.1.0")
     .subcommand(
         Command::new("all")
             .about("Display all system information")
