@@ -1,14 +1,16 @@
 # OSpect: Comprehensive System Diagnostics and Insights
 
 
-<p align="left">
-  <img src="assets/github/OSpect_github.gif" alt="OSpect Logo" width="200" />
-</p>
-
-
 ## Overview
 
-OSpect is a powerful and versatile system information utility tool designed to provide comprehensive diagnostics and insights into your system's hardware and software configuration. With OSpect, you can effortlessly gather detailed information about your operating system, hardware components, network status, and more.
+<div style="display: flex; align-items: center; justify-content: space-between;">
+  <p style="text-align: justify;">
+    OSpect is a powerful and versatile system information utility tool designed to provide comprehensive diagnostics and insights into your system's hardware and software configuration. With OSpect, you can effortlessly gather detailed information about your operating system, hardware components, network status, and more.
+  </p>
+
+  <img src="assets/github/OSpect_github.gif" alt="OSpect Logo" width="200" style="margin-left: 20px;" />
+
+</div>
 
 ## Features
 
