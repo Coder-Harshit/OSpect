@@ -1,6 +1,10 @@
 # OSpect: Comprehensive System Diagnostics and Insights
 
-<!-- ![OSpect Logo](https://your-logo-url-here.com/logo.png) -->
+
+<p align="left">
+  <img src="assets/github/OSpect_github.gif" alt="OSpect Logo" width="200" />
+</p>
+
 
 ## Overview
 
