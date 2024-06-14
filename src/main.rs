@@ -1,5 +1,5 @@
 use colored::*;
-use clap::{Arg,Command};
+use clap::Command;
 use sysinfo::{NetworkExt, ProcessorExt, System, SystemExt};
 use whoami;
 
@@ -10,42 +10,52 @@ fn main() {
     system.refresh_all();
 
     let matches = Command::new("ospect")
-        .about("Display system information")
-        .arg(Arg::new("all")
-            .short('a')
-            .long("all")
-            .help("Display all system information"))
-        .arg(Arg::new("hardware")
-            // .short('h')
-            .long("hardware")
-            .help("Display hardware information"))
-        .arg(Arg::new("network")
-            // .short('n')
-            .long("network")
-            .help("Display network information"))
-        .arg(Arg::new("os")
-            // .short('o')
-            .long("os")
-            .help("Display OS information"))
-        .get_matches();
+    .about("OSpect: Comprehensive System Insights utility tool")
+    .subcommand(
+        Command::new("all")
+            .about("Display all system information")
+    )
+    .subcommand(
+        Command::new("hardware")
+            .about("Display hardware information")
+    )
+    .subcommand(
+        Command::new("network")
+            .about("Display network information")
+    )
+    .subcommand(
+        Command::new("os")
+            .about("Display OS information")
+    )
+    .get_matches();
+
+    // Handle subcommands or default behavior
 
     match matches.subcommand() {
-        Some((subcommand, _)) => { // Destructure the tuple, ignore ArgMatches
-            match subcommand {
-                "all" => {
-                    print_basic_info(&mut system);
-                    print_hardware_info(&mut system);
-                    print_network_info(&mut system);
-                    print_os_info(&mut system);
-                },
-                "hardware" => print_hardware_info(&mut system),
-                "network" => print_network_info(&mut system),
-                "os" => print_os_info(&mut system),
-                _ => println!("Invalid subcommand"), // Handle unknown subcommands (optional)
-            }
+        Some(("all", _)) => {
+            // println!("'all' subcommand used");
+            print_basic_info(&mut system);
+            print_hardware_info(&mut system);
+            print_network_info(&mut system);
+            print_os_info(&mut system);
         },
+        Some(("hardware", _)) => {
+            // println!("'hardware' subcommand used");
+            print_hardware_info(&mut system);
+        },
+        Some(("network", _)) => {
+            // println!("'network' subcommand used");
+            print_network_info(&mut system);
+        },
+        Some(("os", _)) => {
+            // println!("'os' subcommand used");
+            print_os_info(&mut system);
+        },
+        // None => println!("ospect command used without subcommands"), // Default behavior
         None => print_basic_info(&mut system), // Default behavior
+        _ => println!("Invalid subcommand"), // Handle unknown subcommands (optional)
     }
+
 }
 
 fn print_basic_info(system: &mut System) {
