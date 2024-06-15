@@ -13,8 +13,7 @@ fn get_logo_path() -> PathBuf {
 }
 
 fn read_logo(path: PathBuf) -> String {
-    fs::read_to_string(path).unwrap_or_default()
-}
+    fs::read_to_string(path).unwrap_or_else(|_| "Logo not found".red().to_string())}
 
 
 fn main() {
