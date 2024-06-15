@@ -84,7 +84,7 @@ fn main() {
             // println!("'all' subcommand used");
             print_basic_info(&mut system);
             print_hardware_info(&mut system);
-            // print_network_info(&mut system);
+            print_network_info();
             print_os_info();
         },
         Some(("hardware", _)) => {
@@ -99,7 +99,6 @@ fn main() {
             // println!("'os' subcommand used");
             print_os_info();
         },
-        // None => println!("ospect command used without subcommands"), // Default behavior
         None => print_basic_info(&mut system), // Default behavior
         _ => println!("Invalid subcommand"), // Handle unknown subcommands (optional)
     }
@@ -114,7 +113,6 @@ fn print_basic_info(system: &mut System) {
     println!("{}: {}", "Kernel version".blue(), sysinfo::System::kernel_version().unwrap_or_default());
     println!("{}: {} GB", "Total RAM".blue(), system.total_memory() /1024 /1024 /1024);
     println!("{}: {}", "CPU Architecture".blue(), std::env::consts::ARCH);
-    // Add more basic info as needed
 }
 
 fn print_hardware_info(system: &mut System) {
@@ -133,8 +131,6 @@ fn print_hardware_info(system: &mut System) {
         }
         println!("{} {}: {} MHz", "CPU Speed".blue(), i, cpu.frequency());
         println!("{} {}: {}%", "CPU Usage".blue(), i, cpu.cpu_usage());
-        
-        // Additional information can be printed if available
         i+=1;
     }
 }
@@ -156,5 +152,4 @@ fn print_os_info() {
     println!("{}: {}", "OS Name".blue(), sysinfo::System::name().unwrap_or_default());
     println!("{}: {}", "Kernel Version".blue(), sysinfo::System::kernel_version().unwrap_or_default());
     println!("{}: {}", "System Uptime".blue(), format_uptime(sysinfo::System::uptime()));
-    // Add more OS info as needed
 }
