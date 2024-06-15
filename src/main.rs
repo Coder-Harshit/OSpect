@@ -1,13 +1,41 @@
 use colored::*;
 use clap::Command;
-use sysinfo::{NetworkExt, ProcessorExt, System, SystemExt};
+use sysinfo::{CpuRefreshKind, RefreshKind, System ,Networks};
 use whoami;
+
+fn format_uptime(uptime: u64) -> String {
+    let (secs, mins, hours, days) = (uptime % 60, (uptime / 60) % 60, (uptime / 3600) % 24, uptime / (3600 * 24));
+
+    if days > 0 {
+        format!("{} day{}", days, if days > 1 { "s" } else { "" })
+    } else if hours > 0 {
+        format!("{} hour{}", hours, if hours > 1 { "s" } else { "" })
+    } else if mins > 0 {
+        format!("{} minute{}", mins, if mins > 1 { "s" } else { "" })
+    } else {
+        format!("{} second{}", secs, if secs > 1 { "s" } else { "" })
+    }
+}
+
+fn format_network_data(mut data_bytes: u64) -> String {
+    if data_bytes == 0 {
+      return "0 B".to_string();
+    }
+  
+    let units = ["B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB"];
+    let mut power = 0;
+  
+    while data_bytes > 1024 && power < units.len() - 1 {
+      data_bytes /= 1024;
+      power += 1;
+    }
+  
+    format!("{:.1} {}", data_bytes as f64 / 1024.0f64.powf(power as f64), units[power])
+  }
+  
 
 fn main() {
     let mut system = System::new_all();
-
-    // Refresh system information
-    system.refresh_all();
 
     let matches = Command::new("ospect")
     .about("OSpect: Comprehensive System Insights utility tool")
@@ -37,8 +65,8 @@ fn main() {
             // println!("'all' subcommand used");
             print_basic_info(&mut system);
             print_hardware_info(&mut system);
-            print_network_info(&mut system);
-            print_os_info(&mut system);
+            // print_network_info(&mut system);
+            print_os_info();
         },
         Some(("hardware", _)) => {
             // println!("'hardware' subcommand used");
@@ -46,11 +74,11 @@ fn main() {
         },
         Some(("network", _)) => {
             // println!("'network' subcommand used");
-            print_network_info(&mut system);
+            print_network_info();
         },
         Some(("os", _)) => {
             // println!("'os' subcommand used");
-            print_os_info(&mut system);
+            print_os_info();
         },
         // None => println!("ospect command used without subcommands"), // Default behavior
         None => print_basic_info(&mut system), // Default behavior
@@ -62,34 +90,52 @@ fn main() {
 fn print_basic_info(system: &mut System) {
     println!("{}", "Basic System Information".yellow());
     println!("{}: {}", "Username".blue(), whoami::username());
-    println!("{}: {}", "Hostname".blue(), system.host_name().unwrap_or_default());
-    println!("{}: {}", "OS".blue(), system.name().unwrap_or_default());
-    println!("{}: {}", "Kernel version".blue(), system.kernel_version().unwrap_or_default());
-    println!("{}: {} GB", "Total RAM".blue(), system.total_memory() / 1024 / 1024);
+    println!("{}: {}", "Hostname".blue(), sysinfo::System::host_name().unwrap_or_default());
+    println!("{}: {}", "OS".blue(), sysinfo::System::name().unwrap_or_default());
+    println!("{}: {}", "Kernel version".blue(), sysinfo::System::kernel_version().unwrap_or_default());
+    println!("{}: {} GB", "Total RAM".blue(), system.total_memory() /1024 /1024 /1024);
+    println!("{}: {}", "CPU Architecture".blue(), std::env::consts::ARCH);
     // Add more basic info as needed
 }
 
 fn print_hardware_info(system: &mut System) {
     println!("{}", "Detailed Hardware Information".yellow());
     println!("{}: {} GB", "Total Memory".blue(), system.total_memory() / 1024 / 1024);
-    println!("{}: {}", "Total CPU Cores".blue(), system.processors().len());
-    for processor in system.processors() {
-        println!("{}: {}", "CPU Model".blue(), processor.name());
-        println!("{}: {} MHz", "CPU Speed".blue(), processor.frequency());
-    }
-}
-fn print_network_info(system: &mut System) {
-    println!("{}", "Network Information".yellow());
-    for (interface_name, network) in system.networks() {
-        println!("{}: {}", "Network Interface".blue(), interface_name);
-        println!("{}: {} Mbps", "Received Data".blue(), network.received() as f64 / 1024.0 / 1024.0);
-        println!("{}: {} Mbps", "Transmitted Data".blue(), network.transmitted() as f64 / 1024.0 / 1024.0);
+    println!("{}: {}", "Total CPU Cores".blue(), system.physical_core_count().unwrap_or_default());
+    let s = System::new_with_specifics(
+        RefreshKind::new().with_cpu(CpuRefreshKind::everything()),
+    );
+    let mut i=0;
+    let mut is_first_cpu = true;
+    for cpu in s.cpus() {
+        if is_first_cpu {
+            println!("{}: {}", "CPU Model".blue(), cpu.brand());
+            is_first_cpu = false;
+        }
+        println!("{} {}: {} MHz", "CPU Speed".blue(), i, cpu.frequency());
+        println!("{} {}: {}%", "CPU Usage".blue(), i, cpu.cpu_usage());
+        
+        // Additional information can be printed if available
+        i+=1;
     }
 }
 
-fn print_os_info(system: &mut System) {
+fn print_network_info() {
+    println!("{}", "Network Information".yellow());
+    let networks = Networks::new_with_refreshed_list();
+    for (interface_name , network) in &networks {
+        println!("[{interface_name}]"); 
+        println!("MAC Address: {}", network.mac_address());
+        println!("Total Packets Received: {}", format_network_data(network.total_packets_received()));
+        println!("Total Packets Transmitted: {}", format_network_data(network.total_packets_transmitted()));
+        println!();
+    }
+}
+
+fn print_os_info() {
     println!("{}", "Detailed OS Information".yellow());
-    println!("{}: {}", "OS Name".blue(), system.name().unwrap_or_default());
-    println!("{}: {}", "Kernel Version".blue(), system.kernel_version().unwrap_or_default());
+    println!("{}: {}", "OS Name".blue(), sysinfo::System::name().unwrap_or_default());
+    println!("{}: {}", "Kernel Version".blue(), sysinfo::System::kernel_version().unwrap_or_default());
+    println!("{}: {}", "System Uptime".blue(), format_uptime(sysinfo::System::uptime()));
     // Add more OS info as needed
 }
