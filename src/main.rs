@@ -2,6 +2,19 @@ use colored::*;
 use clap::Command;
 use sysinfo::{CpuRefreshKind, RefreshKind, System ,Networks};
 use whoami;
+use std::{env, fs};
+use std::path::PathBuf;
+
+fn get_logo_path() -> PathBuf {
+    let mut project_root_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap_or_default());
+    project_root_dir.push("assets");
+    project_root_dir.push("logo.txt");
+    project_root_dir
+}
+
+fn read_logo(path: PathBuf) -> String {
+    fs::read_to_string(path).unwrap_or_else(|_| "Logo not found".red().to_string())}
+
 
 fn format_uptime(uptime: u64) -> String {
     let (secs, mins, hours, days) = (uptime % 60, (uptime / 60) % 60, (uptime / 3600) % 24, uptime / (3600 * 24));
@@ -58,8 +71,14 @@ fn main() {
     )
     .get_matches();
 
-    // Handle subcommands or default behavior
 
+    // Read ASCII logo
+    let logo_path = get_logo_path();
+    let logo = read_logo(logo_path);
+    println!("{}", logo);  // Display the logo
+
+
+    // Handle subcommands or default behavior
     match matches.subcommand() {
         Some(("all", _)) => {
             // println!("'all' subcommand used");
