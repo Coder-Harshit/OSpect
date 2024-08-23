@@ -9,7 +9,7 @@ fi
 
 # Clone the OSpect repository
 echo "Cloning OSpect repository..."
-git clone https://github.com/yourusername/OSpect.git
+git clone https://github.com/Coder-Harshit/OSpect.git
 cd OSpect
 
 # Build and install OSpect
