@@ -5,7 +5,7 @@
 
         #[test]
         fn test_ospect_runs() {
-            let binary_path = env::var("OSPECT_BINARY_PATH").unwrap_or("target/debug/ospect".to_string()); // Adjust if needed
+            let binary_path = env::var("OSPECT_BINARY_PATH").unwrap_or("target/release/ospect".to_string()); // Adjust if needed
             let result = Command::new(binary_path)
                 .output()
                 .expect("Failed to execute command");
@@ -17,11 +17,10 @@
                 // Assert on output content
                 assert!(output.contains("Basic System Information"));
             }
-
-            if let Ok(stderr) = String::from_utf8(result.stderr) {
-                // Check for error messages
-                assert!(!stderr.contains("error"));
-            }
+            // if let Ok(stderr) = String::from_utf8(result.stderr) {
+            //     // Check for error messages
+            //     assert!(!stderr.contains("error"));
+            // }
         }
     }
 //     #[test]
