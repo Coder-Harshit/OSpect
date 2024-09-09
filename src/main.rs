@@ -72,13 +72,12 @@ fn print_basic_info(){
     let osname_output = &osname_output[6..osname_output.len() - 2];
     println!("{}: {}", "OS".blue(), osname_output);
 
-
-
-//     println!("{}: {}", "Hostname".blue(), sysinfo::System::host_name().unwrap_or_default());
-//     println!("{}: {}", "OS".blue(), sysinfo::System::name().unwrap_or_default());
-//     println!("{}: {}", "Kernel version".blue(), sysinfo::System::kernel_version().unwrap_or_default());
-//     println!("{}: {} GB", "Total RAM".blue(), system.total_memory() /1024 /1024 /1024);
-//     println!("{}: {}", "CPU Architecture".blue(), std::env::consts::ARCH);
+    let kernel = Command::new("uname")
+        .arg("-r")
+        .output()
+        .expect("Failed to execute `uname` command");
+    let kernel_output = String::from_utf8(kernel.stdout).unwrap();
+    print!("{}: {}", "Kernel".blue(), kernel_output);
 }
 
 fn main() {
