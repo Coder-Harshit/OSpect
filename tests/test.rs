@@ -8,7 +8,7 @@ mod tests {
         let result = Command::new("target/release/ospect") // Specify the binary path
             .output()
             .expect("Failed to execute command (BASIC)");
-        assert!(result.status.success());
+        assert!(result.status.success(), "Command failed with exit code: {}", result.status.code().unwrap_or(-1));
     }
 
 //     #[test]
