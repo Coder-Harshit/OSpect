@@ -48,36 +48,93 @@ use colored::Colorize;
 //     format!("{:.1} {}", data_bytes as f64 / 1024.0f64.powf(power as f64), units[power])
 //   }
 
+fn fetch_username() -> Result<String, Box<dyn std::error::Error>> {
+    let output = Command::new("whoami")
+    .output()
+    .expect("Failed to execute `whoami` command");
+    let username = String::from_utf8(output.stdout)?;
+    let username = username.trim();
+    return Ok(username.to_string());
+}
+
+fn fetch_hostname() -> Result<String, Box<dyn std::error::Error>> {
+    let output = Command::new("hostname")
+        .output()?;
+    let hostname = String::from_utf8(output.stdout)?;
+    let hostname = hostname.trim();
+    return Ok(hostname.to_string());
+}
+
+fn fetch_osname() -> Result<String, Box<dyn std::error::Error>> {
+    let output= Command::new("/bin/bash")
+        .args(["-c", "/bin/head -n 1 /etc/os-release | awk -F '=' '{print $2}'"])
+        .output()?;
+    let osname = String::from_utf8(output.stdout)?;
+    let trimmed_osname = osname.trim().trim_matches('"');
+    return Ok(trimmed_osname.to_string());
+}
+
+fn fetch_kernel() -> Result<String, Box<dyn std::error::Error>> {
+    let output = Command::new("uname")
+        .arg("-r")
+        .output()?;
+    let kernel = String::from_utf8(output.stdout)?;
+    let kernel = kernel.trim();
+    return  Ok(kernel.to_string());
+}
+
+fn fetch_total_mem() -> Result<u64, Box<dyn std::error::Error>>{
+    let tmem = Command::new("/bin/bash")
+        .args(["-c","/bin/cat /proc/meminfo | /bin/grep MemTotal | awk '{print $2}'"])
+        .output()?;
+    let stdout = String::from_utf8(tmem.stdout)?;
+    let tmem: u64 = stdout.trim().parse()?;
+
+    return Ok(tmem);
+}
+
+
+
+
 fn print_basic_info(){
     println!("{}", "Basic System Information".yellow());
 
-    let username = Command::new("whoami")
-        .output()
-        .expect("Failed to execute `whoami` command");
-    let username_output = String::from_utf8(username.stdout).unwrap();
-    print!("{}: {}", "Username".blue(), username_output);
+    match fetch_username() {
+        Ok(username) => {
+            println!("{}: {}", "Username".blue(), username);
+        }
+        Err(err) => println!("Error: {}", err),
+    }
 
-    let hostname = Command::new("hostname")
-        .output()
-        .expect("Failed to execute `hostname` command");
-    let hostname_output = String::from_utf8(hostname.stdout).unwrap();
-    print!("{}: {}", "Hostname".blue(), hostname_output);
+    match fetch_hostname() {
+        Ok(hostname) => {
+            println!("{}: {}", "Hostname".blue(), hostname);
+        }
+        Err(err) => println!("Error: {}", err),
+    }
 
-    let osname       = Command::new("/bin/head")
-        .args(["-n","1","/etc/os-release"])
-    // "| awk -F '=' '{print $2}'"
-        .output()
-        .expect("Failed to execute command for filting");
-    let osname_output = String::from_utf8(osname.stdout).unwrap();
-    let osname_output = &osname_output[6..osname_output.len() - 2];
-    println!("{}: {}", "OS".blue(), osname_output);
+    match fetch_osname() {
+        Ok(osname) => {
+            println!("{}: {}", "OS".blue(), osname);
+        }
+        Err(err) => println!("Error: {}", err),
+    }
 
-    let kernel = Command::new("uname")
-        .arg("-r")
-        .output()
-        .expect("Failed to execute `uname` command");
-    let kernel_output = String::from_utf8(kernel.stdout).unwrap();
-    print!("{}: {}", "Kernel".blue(), kernel_output);
+    match fetch_kernel() {
+        Ok(kernel) => {
+            println!("{}: {}", "Kernel".blue(), kernel);
+        }
+        Err(err) => println!("Error: {}", err),
+    }
+
+    match fetch_total_mem() {
+        Ok(total_mem) => {
+            let total_mem_mb = total_mem / (1024*1024);
+            println!("{}: {} GB", "Total memory".blue(), total_mem_mb);
+        }
+        Err(err) => println!("Error: {}", err),
+    }
+
 }
 
 fn main() {
