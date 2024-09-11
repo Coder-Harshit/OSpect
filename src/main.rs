@@ -5,30 +5,105 @@
 // use std::{env, fs};
 // use std::path::PathBuf;
 
-use std::{env, process::Command, fs, error::Error};
+use std::{env, error::Error, fs, process::{exit, Command}};
 use colored::Colorize;
-use serde::Deserialize;
+// use serde::Deserialize;
+// use toml::Value;
 
 
-#[derive(Deserialize)]
-struct Config{
-    basic: BasicConfig,
-}
+// #[derive(Deserialize)]
+// struct Config{
+//     basic: BasicConfig,
+// }
+// #[derive(Deserialize)]
+// struct BasicConfig{
+//     hostname: Vec<String>,
+//     username: Vec<String>,
+//     osname: Vec<String>,
+//     kernel: Vec<String>,
+//     total_memory: Vec<String>,
+// }
 
-#[derive(Deserialize)]
-struct BasicConfig{
-    hostname: bool,
-    username: bool,
-    osname: bool,
-    kernel: bool,
-    total_memory: bool,
-}
 
-
-fn load_config(file_path: &str) -> Result<Config, Box<dyn Error>> {
+fn load_config(file_path: &str, flag_type: &str) -> Result<Vec<String>, Box<dyn Error>> {
     let config_content = fs::read_to_string(file_path)?;
-    let config: Config = toml::from_str(&config_content)?;
-    Ok(config)
+
+    let mut options = Vec::new();
+    let mut in_section = false;
+    for line in config_content.lines(){
+
+        let trimmed_line = line.trim();
+        if trimmed_line.is_empty() || trimmed_line.starts_with("#"){continue;}
+        if trimmed_line.starts_with("["){
+            if trimmed_line == format!("[{}]",flag_type){
+                // within the required section
+                in_section=true;
+            }
+            else{
+                // reached other section title
+                in_section=false;
+                continue;
+            }
+        }else if in_section{
+            // if within the section then add options
+            options.push(trimmed_line.to_string());
+        }
+    }
+    // println!("{:?}",options);
+
+    Ok(options)
+
+    // fn extract_options(section: &Value) -> Vec<String> {
+    //     let mut options = Vec::new();
+    //     if let Some(table) = section.as_table() {
+    //         for (key, _) in table {
+    //             options.push(key.to_string());
+    //         }
+    //     }
+    //     options
+    // }
+    // match flag_type {
+    //     "basic" => {
+    //         if let Some(basic) = value.get("basic"){
+    //             if basic.as_table().is_some() {
+    //                 options.extend(extract_options(basic))
+    //             }
+    //         }else{
+    //             println!("'basic' block missing in config file")
+    //         }
+    //     },
+    //     "network" => {
+    //         if let Some(network) = value.get("network"){
+    //             if network.as_table().is_some() {
+    //                 options.extend(extract_options(network))
+    //             }
+    //         }else{
+    //             println!("'network' block missing in config file")
+    //         }
+    //     },
+    //     "hardware" => {
+    //         if let Some(hardware) = value.get("hardware"){
+    //             if hardware.as_table().is_some() {
+    //                 options.extend(extract_options(hardware))
+    //             }
+    //         }else{
+    //             println!("'hardware' block missing in config file")
+    //         }
+    //     },
+    //     "os" => {
+    //         if let Some(os) = value.get("os"){
+    //             if os.as_table().is_some() {
+    //                 options.extend(extract_options(os))
+    //             }
+    //         }else{
+    //             println!("'os' block missing in config file")
+    //         }
+    //     },
+    //     _ => {
+    //         println!("ERROR");
+    //     },
+    // }
+
 }
 
 
@@ -44,7 +119,6 @@ fn load_config(file_path: &str) -> Result<Config, Box<dyn Error>> {
 
 // fn format_uptime(uptime: u64) -> String {
 //     let (secs, mins, hours, days) = (uptime % 60, (uptime / 60) % 60, (uptime / 3600) % 24, uptime / (3600 * 24));
-
 //     if days > 0 {
 //         format!("{} day{}", days, if days > 1 { "s" } else { "" })
 //     } else if hours > 0 {
@@ -60,15 +134,12 @@ fn load_config(file_path: &str) -> Result<Config, Box<dyn Error>> {
 //     if data_bytes == 0 {
 //       return "0 B".to_string();
 //     }
-
 //     let units = ["B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB"];
 //     let mut power = 0;
-
 //     while data_bytes > 1024 && power < units.len() - 1 {
 //       data_bytes /= 1024;
 //       power += 1;
 //     }
-
 //     format!("{:.1} {}", data_bytes as f64 / 1024.0f64.powf(power as f64), units[power])
 //   }
 
@@ -119,7 +190,7 @@ fn fetch_total_mem() -> Result<u64, Box<dyn std::error::Error>>{
 
 
 
-
+/*
 fn print_basic_info(config_file:Config){
     println!("{}", "Basic System Information".yellow());
 
@@ -168,13 +239,71 @@ fn print_basic_info(config_file:Config){
         }
     }
 }
+*/
+
+fn fetching_value(options:Vec<String>){
+    for i in options{
+        match i.as_str(){
+            "username" => {
+                match fetch_username() {
+                    Ok(username) => {
+                        println!("{}: {}", "Username".blue(), username);
+                    }
+                    Err(err) => println!("Error: {}", err),
+                }
+            },
+            "hostname" => {
+                match fetch_hostname() {
+                    Ok(hostname) => {
+                        println!("{}: {}", "Hostname".blue(), hostname);
+                    }
+                    Err(err) => println!("Error: {}", err),
+                }
+            },
+            "osname" => {
+                match fetch_osname() {
+                    Ok(osname) => {
+                        println!("{}: {}", "OS".blue(), osname);
+                    }
+                    Err(err) => println!("Error: {}", err),
+                }
+            },
+            "kernel" => {
+                match fetch_kernel() {
+                    Ok(kernel) => {
+                        println!("{}: {}", "Kernel".blue(), kernel);
+                    }
+                    Err(err) => println!("Error: {}", err),
+                }
+            },
+            "total_memory" => {
+                match fetch_total_mem() {
+                    Ok(total_mem) => {
+                        let total_mem = total_mem / (1024 * 1024);
+                        println!("{}: {} GB", "Total Memory".blue(), total_mem);
+                    }
+                    Err(err) => println!("Error: {}", err),
+                }
+            },
+            "ip" => {},
+            "mac" => {},
+            "interfaces" => {},
+            "active_connections" => {},
+            "cpu" => {},
+            "gpu" => {},
+            "disk" => {},
+            _ => {
+                println!("ERROR!!!");
+                exit(1);
+            }
+        }
+    }
+}
 
 fn main() {
 
     let home = env::var("HOME").expect("HOME variable not set");
     let config_path = format!("{home}/.config/ospect/config.toml") ;
-    let config = load_config(&config_path).expect("Failed to load config");
-
     let args:Vec<String> = env::args().collect();
 
     // for itr in &args {
@@ -184,10 +313,36 @@ fn main() {
     match args.len() {
         1 => {
             // default option to run
-            print_basic_info(config);
+            let options = load_config(&config_path,"basic").expect("Failed to load config");
+            // print_basic_info(options);
+            // println!("{:?}",options);
+
+            println!("{}", "Basic System Analytics".yellow());
+            fetching_value(options);
+
         },
         2 => {
+            let options = load_config(&config_path,&args[1]).expect("Failed to load config");
             // specialized output
+            match args[1].to_ascii_lowercase().as_str(){
+                "network"=> {
+                    println!("{}", "Network Analytics".yellow());
+                },
+                "hardware" => {
+                    println!("{}", "Hardware Analytics".yellow());
+                },
+                "os" => {
+                    println!("{}", "System Analytics".yellow());
+                },
+                _ =>{
+                    println!("Invalid Option Passed!!\nBelow are the list of available options/flags:");
+                    println!("network");
+                    println!("hardware");
+                    println!("os");
+                }
+            }
+            fetching_value(options);
+
         },
         _ => {
             println!("Invalid Number of parameters passed");
@@ -195,7 +350,6 @@ fn main() {
     }
 
     // let mut system = System::new_all();
-
     // let matches = Command::new("ospect")
     // .about("OSpect: Comprehensive System Insights utility tool")
     // .version("0.1.0")
