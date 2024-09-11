@@ -5,8 +5,32 @@
 // use std::{env, fs};
 // use std::path::PathBuf;
 
-use std::{env, process::Command};
+use std::{env, process::Command, fs, error::Error};
 use colored::Colorize;
+use serde::Deserialize;
+
+
+#[derive(Deserialize)]
+struct Config{
+    basic: BasicConfig,
+}
+
+#[derive(Deserialize)]
+struct BasicConfig{
+    hostname: bool,
+    username: bool,
+    osname: bool,
+    kernel: bool,
+    total_memory: bool,
+}
+
+
+fn load_config(file_path: &str) -> Result<Config, Box<dyn Error>> {
+    let config_content = fs::read_to_string(file_path)?;
+    let config: Config = toml::from_str(&config_content)?;
+    Ok(config)
+}
+
 
 // fn get_logo_path() -> PathBuf {
 //     let mut project_root_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap_or_default());
@@ -96,48 +120,60 @@ fn fetch_total_mem() -> Result<u64, Box<dyn std::error::Error>>{
 
 
 
-fn print_basic_info(){
+fn print_basic_info(config_file:Config){
     println!("{}", "Basic System Information".yellow());
 
-    match fetch_username() {
-        Ok(username) => {
-            println!("{}: {}", "Username".blue(), username);
+    if config_file.basic.username{
+        match fetch_username() {
+            Ok(username) => {
+                println!("{}: {}", "Username".blue(), username);
+            }
+            Err(err) => println!("Error: {}", err),
         }
-        Err(err) => println!("Error: {}", err),
+    }
+    if config_file.basic.hostname{
+        match fetch_hostname() {
+            Ok(hostname) => {
+                println!("{}: {}", "Hostname".blue(), hostname);
+            }
+            Err(err) => println!("Error: {}", err),
+        }
     }
 
-    match fetch_hostname() {
-        Ok(hostname) => {
-            println!("{}: {}", "Hostname".blue(), hostname);
+    if config_file.basic.osname{
+        match fetch_osname() {
+            Ok(osname) => {
+                println!("{}: {}", "OS".blue(), osname);
+            }
+            Err(err) => println!("Error: {}", err),
         }
-        Err(err) => println!("Error: {}", err),
     }
 
-    match fetch_osname() {
-        Ok(osname) => {
-            println!("{}: {}", "OS".blue(), osname);
+    if config_file.basic.kernel{
+        match fetch_kernel() {
+            Ok(kernel) => {
+                println!("{}: {}", "Kernel".blue(), kernel);
+            }
+            Err(err) => println!("Error: {}", err),
         }
-        Err(err) => println!("Error: {}", err),
     }
 
-    match fetch_kernel() {
-        Ok(kernel) => {
-            println!("{}: {}", "Kernel".blue(), kernel);
+    if config_file.basic.total_memory{
+        match fetch_total_mem() {
+            Ok(total_mem) => {
+                let total_mem_mb = total_mem / (1024*1024);
+                println!("{}: {} GB", "Total memory".blue(), total_mem_mb);
+            }
+            Err(err) => println!("Error: {}", err),
         }
-        Err(err) => println!("Error: {}", err),
     }
-
-    match fetch_total_mem() {
-        Ok(total_mem) => {
-            let total_mem_mb = total_mem / (1024*1024);
-            println!("{}: {} GB", "Total memory".blue(), total_mem_mb);
-        }
-        Err(err) => println!("Error: {}", err),
-    }
-
 }
 
 fn main() {
+
+    let home = env::var("HOME").expect("HOME variable not set");
+    let config_path = format!("{home}/.config/ospect/config.toml") ;
+    let config = load_config(&config_path).expect("Failed to load config");
 
     let args:Vec<String> = env::args().collect();
 
@@ -148,7 +184,7 @@ fn main() {
     match args.len() {
         1 => {
             // default option to run
-            print_basic_info();
+            print_basic_info(config);
         },
         2 => {
             // specialized output
