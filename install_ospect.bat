@@ -1,11 +1,10 @@
-@echo off
-:: SETLOCAL
+@setlocal enableextensions
 
 :: Check if curl is installed
 where curl >nul 2>nul
 if %errorlevel% neq 0 (
     echo curl is not installed. Please install curl and run this script again.
-    exit /b 1
+    goto :eof
 )
 
 :: Install Rust and Cargo if not already installed
@@ -17,11 +16,17 @@ if %errorlevel% neq 0 (
 )
 
 :: Clone OSpect repo if it doesn't exist
-if not exist OSpect (
+if exist OSpect (
+    echo OSpect directory already exists. Skipping clone.
+) else (
+    :: Check if git is installed
+    where git >nul 2>nul
+    if %errorlevel% neq 0 (
+        echo git is not installed. Please install git and run this script again.
+        goto :eof
+    )
     echo Cloning OSpect repository...
     git clone https://github.com/Coder-Harshit/OSpect.git
-) else (
-    echo OSpect directory already exists. Skipping clone.
 )
 cd OSpect
 
@@ -30,7 +35,7 @@ echo Building OSpect...
 call cargo build --release
 if %errorlevel% neq 0 (
     echo Build failed. Please check the error messages above.
-    exit /b 1
+    goto :eof
 )
 
 call cargo install --path .
@@ -38,8 +43,7 @@ call cargo install --path .
 :: Add OSpect to PATH
 set "PATH=%PATH%;%CD%\target\release"
 
-:: Run OSpect help command
-::echo Running OSpect help command...
-::ospect --help
-
 echo Installation complete! You can now use the 'ospect' command.
+pause
+
+:eof
