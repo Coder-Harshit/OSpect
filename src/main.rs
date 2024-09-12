@@ -130,7 +130,6 @@ fn fetch_total_mem() -> Result<u64, Box<dyn std::error::Error>>{
     let stdout = String::from_utf8(output.stdout)?;
     let tmem: u64 = stdout.trim().parse()?;
     if cfg!(target_os="windows"){
-        println!("{}",tmem);
         return Ok(tmem/1024)
     }
     return Ok(tmem);
@@ -138,19 +137,30 @@ fn fetch_total_mem() -> Result<u64, Box<dyn std::error::Error>>{
 }
 
 fn fetch_pvt_ip() -> Result<String, Box<dyn std::error::Error>> {
-    let output = Command::new("/bin/sh")
+    let output = if cfg!(target_os="windows"){
+        Command::new("powershell")
+        .args(["-Command", " (Get-NetIPConfiguration | Get-NetIPAddress | Select-Object -First 1).IPAddress"])
+        .output()?
+    }else{
+        Command::new("/bin/sh")
         .args(["-c","ip -4 addr show | awk '/inet / && !/127.0.0.1/ {split($2, a, \"/\"); print a[1]}'"])
-        .output()?;
+        .output()?
+    };
     let pvt_ip = String::from_utf8(output.stdout)?;
     let pvt_ip = pvt_ip.trim();
     return Ok(pvt_ip.to_string());
 }
 
 fn fetch_pub_ip() -> Result<String, Box<dyn std::error::Error>> {
-    let output = Command::new("/bin/curl")
-        .arg("https://api.ipify.org/")
-        .output()?;
-
+    let output = if cfg!(target_os="windows"){
+        Command::new("powershell")
+            .args(["-Command","(Invoke-WebRequest -Uri 'https://api.ipify.org').Content"])
+            .output()?
+    }else{
+        Command::new("/bin/curl")
+            .arg("https://api.ipify.org")
+            .output()?
+    };
     if output.status.success() {
         let pub_ip = String::from_utf8(output.stdout)?;
         let pub_ip = pub_ip.trim();
@@ -161,65 +171,20 @@ fn fetch_pub_ip() -> Result<String, Box<dyn std::error::Error>> {
 }
 
 fn fetch_mac_addr() -> Result<String, Box<dyn std::error::Error>> {
-    let output = Command::new("/bin/sh")
+    let output = if cfg!(target_os="windows"){
+        Command::new("powershell")
+        .args(["-Command","Get-NetAdapter | Where-Object { $_.Status -eq 'Up' } | Select-Object -First 1 -ExpandProperty MacAddress"])
+        .output()?
+    }else{
+    Command::new("/bin/sh")
         .args(["-c","ip link show | awk '/ether/ {print $2}'"])
-        .output()?;
+        .output()?
+    };
+
     let mac_addr = String::from_utf8(output.stdout)?;
     let mac_addr = mac_addr.trim();
     return Ok(mac_addr.to_string());
 }
-
-
-/*
-fn print_basic_info(config_file:Config){
-    println!("{}", "Basic System Information".yellow());
-
-    if config_file.basic.username{
-        match fetch_username() {
-            Ok(username) => {
-                println!("{}: {}", "Username".blue(), username);
-            }
-            Err(err) => println!("Error: {}", err),
-        }
-    }
-    if config_file.basic.hostname{
-        match fetch_hostname() {
-            Ok(hostname) => {
-                println!("{}: {}", "Hostname".blue(), hostname);
-            }
-            Err(err) => println!("Error: {}", err),
-        }
-    }
-
-    if config_file.basic.osname{
-        match fetch_osname() {
-            Ok(osname) => {
-                println!("{}: {}", "OS".blue(), osname);
-            }
-            Err(err) => println!("Error: {}", err),
-        }
-    }
-
-    if config_file.basic.kernel{
-        match fetch_kernel() {
-            Ok(kernel) => {
-                println!("{}: {}", "Kernel".blue(), kernel);
-            }
-            Err(err) => println!("Error: {}", err),
-        }
-    }
-
-    if config_file.basic.total_memory{
-        match fetch_total_mem() {
-            Ok(total_mem) => {
-                let total_mem_mb = total_mem / (1024*1024);
-                println!("{}: {} GB", "Total memory".blue(), total_mem_mb);
-            }
-            Err(err) => println!("Error: {}", err),
-        }
-    }
-}
-*/
 
 fn fetching_value(options:Vec<String>){
     for i in options{
