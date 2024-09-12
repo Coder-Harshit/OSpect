@@ -188,6 +188,37 @@ fn fetch_total_mem() -> Result<u64, Box<dyn std::error::Error>>{
     return Ok(tmem);
 }
 
+fn fetch_pvt_ip() -> Result<String, Box<dyn std::error::Error>> {
+    let output = Command::new("/bin/bash")
+        .args(["-c","ip -4 addr show | awk '/inet / && !/127.0.0.1/ {split($2, a, \"/\"); print a[1]}'"])
+        .output()?;
+    let pvt_ip = String::from_utf8(output.stdout)?;
+    let pvt_ip = pvt_ip.trim();
+    return Ok(pvt_ip.to_string());
+}
+
+fn fetch_pub_ip() -> Result<String, Box<dyn std::error::Error>> {
+    let output = Command::new("/bin/curl")
+        .arg("https://api.ipify.org/")
+        .output()?;
+
+    if output.status.success() {
+        let pub_ip = String::from_utf8(output.stdout)?;
+        let pub_ip = pub_ip.trim();
+        Ok(pub_ip.to_string())
+    } else {
+        Err("Not connected to the internet or unable to fetch public IP.".into())
+    }
+}
+
+fn fetch_mac_addr() -> Result<String, Box<dyn std::error::Error>> {
+    let output = Command::new("/bin/bash")
+        .args(["-c","ip link show | awk '/ether/ {print $2}'"])
+        .output()?;
+    let mac_addr = String::from_utf8(output.stdout)?;
+    let mac_addr = mac_addr.trim();
+    return Ok(mac_addr.to_string());
+}
 
 
 /*
@@ -249,7 +280,7 @@ fn fetching_value(options:Vec<String>){
                     Ok(username) => {
                         println!("{}: {}", "Username".blue(), username);
                     }
-                    Err(err) => println!("Error: {}", err),
+                    Err(err) => println!("{}: {}", "Error".red(), err),
                 }
             },
             "hostname" => {
@@ -257,7 +288,7 @@ fn fetching_value(options:Vec<String>){
                     Ok(hostname) => {
                         println!("{}: {}", "Hostname".blue(), hostname);
                     }
-                    Err(err) => println!("Error: {}", err),
+                    Err(err) => println!("{}: {}", "Error".red(), err),
                 }
             },
             "osname" => {
@@ -265,7 +296,7 @@ fn fetching_value(options:Vec<String>){
                     Ok(osname) => {
                         println!("{}: {}", "OS".blue(), osname);
                     }
-                    Err(err) => println!("Error: {}", err),
+                    Err(err) => println!("{}: {}", "Error".red(), err),
                 }
             },
             "kernel" => {
@@ -273,7 +304,7 @@ fn fetching_value(options:Vec<String>){
                     Ok(kernel) => {
                         println!("{}: {}", "Kernel".blue(), kernel);
                     }
-                    Err(err) => println!("Error: {}", err),
+                    Err(err) => println!("{}: {}", "Error".red(), err),
                 }
             },
             "total_memory" => {
@@ -282,11 +313,32 @@ fn fetching_value(options:Vec<String>){
                         let total_mem = total_mem / (1024 * 1024);
                         println!("{}: {} GB", "Total Memory".blue(), total_mem);
                     }
-                    Err(err) => println!("Error: {}", err),
+                    Err(err) => println!("{}: {}", "Error".red(), err),
                 }
             },
-            "ip" => {},
-            "mac" => {},
+            "ip" => {
+                match fetch_pvt_ip() {
+                    Ok(pvt_ip) => {
+                        println!("{}: {}", "Private IP Address".blue(), pvt_ip);
+                    }
+                    Err(err) => println!("{}: {}", "Error".red(), err),
+                }
+                match fetch_pub_ip() {
+                    Ok(pub_ip) => {
+                        println!("{}: {}", "Public IP Address".blue(), pub_ip);
+                    }
+                    Err(err) => println!("{}: {}", "Error".red(), err),
+                }
+            },
+            "mac" => {
+                match fetch_mac_addr() {
+                    Ok(mac_addr) => {
+                        println!("{}: {}", "MAC Address".blue(), mac_addr);
+                    }
+                    Err(err) => println!("{}: {}", "Error".red(), err),
+                }
+
+            },
             "interfaces" => {},
             "active_connections" => {},
             "cpu" => {},
