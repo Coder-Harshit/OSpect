@@ -1,3 +1,4 @@
+@echo off
 @setlocal enableextensions
 
 :: Check if curl is installed
