@@ -7,4 +7,3 @@ authors = ["HARSHIT VIJAY"]
 [dependencies]
 colored = "2.1.0"
 dirs = "5.0.1"
-toml = "0.8.19"

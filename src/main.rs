@@ -1,29 +1,5 @@
-// use colored::*;
-// use clap::Command;
-// use sysinfo::{CpuRefreshKind, RefreshKind, System ,Networks};
-// use whoami;
-// use std::{env, fs};
-// use std::path::PathBuf;
-
 use std::{env, error::Error, fs, path::PathBuf, process::{exit, Command}};
 use colored::Colorize;
-// use serde::Deserialize;
-// use toml::Value;
-
-
-// #[derive(Deserialize)]
-// struct Config{
-//     basic: BasicConfig,
-// }
-// #[derive(Deserialize)]
-// struct BasicConfig{
-//     hostname: Vec<String>,
-//     username: Vec<String>,
-//     osname: Vec<String>,
-//     kernel: Vec<String>,
-//     total_memory: Vec<String>,
-// }
-
 
 fn load_config(file_path: PathBuf, flag_type: &str) -> Result<Vec<String>, Box<dyn Error>> {
     let config_content = fs::read_to_string(file_path)?;
