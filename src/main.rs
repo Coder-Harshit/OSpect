@@ -253,11 +253,21 @@ fn fetching_value(options:Vec<String>){
                 }
 
             },
-            "interfaces" => {},
-            "active_connections" => {},
-            "cpu" => {},
-            "gpu" => {},
-            "disk" => {},
+            "interfaces" => {
+                println!("To Be Implemented, WIP!");
+            },
+            "active_connections" => {
+                println!("To Be Implemented, WIP!");
+            },
+            "cpu" => {
+                println!("To Be Implemented, WIP!");
+            },
+            "gpu" => {
+                println!("To Be Implemented, WIP!");
+            },
+            "disk" => {
+                println!("To Be Implemented, WIP!");
+            },
             _ => {
                 println!("ERROR!!!");
                 exit(1);
