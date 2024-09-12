@@ -83,8 +83,8 @@ fn fetch_hostname() -> Result<String, Box<dyn std::error::Error>> {
 
 fn fetch_osname() -> Result<String, Box<dyn std::error::Error>> {
     let output= if cfg!(target_os="windows"){
-        Command::new("/bin/sh")
-        .args(["-c", "/bin/head -n 1 /etc/os-release | awk -F '=' '{print $2}'"])
+        Command::new("cmd")
+        .args(["/C", "ver"])
         .output()?
     }else{
         Command::new("/bin/sh")
@@ -93,6 +93,11 @@ fn fetch_osname() -> Result<String, Box<dyn std::error::Error>> {
     };
     let osname = String::from_utf8(output.stdout)?;
     let trimmed_osname = osname.trim().trim_matches('"');
+    if cfg!(target_os="windows"){
+        if let Some(pos) = trimmed_osname.find("["){
+            return Ok(trimmed_osname[..pos].to_string())
+        }
+    };
     return Ok(trimmed_osname.to_string());
 }
 
@@ -113,19 +118,23 @@ fn fetch_kernel() -> Result<String, Box<dyn std::error::Error>> {
 }
 
 fn fetch_total_mem() -> Result<u64, Box<dyn std::error::Error>>{
-    let tmem = if cfg!(target_os="windows"){
-        Command::new("/bin/sh")
-        .args(["-c","/bin/cat /proc/meminfo | /bin/grep MemTotal | awk '{print $2}'"])
+    let output = if cfg!(target_os="windows"){
+        Command::new("powershell")
+        .args(["-Command","(Get-CimInstance -ClassName Win32_ComputerSystem).TotalPhysicalMemory"])
         .output()?
     } else{
         Command::new("/bin/sh")
         .args(["-c","/bin/cat /proc/meminfo | /bin/grep MemTotal | awk '{print $2}'"])
         .output()?
     };
-    let stdout = String::from_utf8(tmem.stdout)?;
+    let stdout = String::from_utf8(output.stdout)?;
     let tmem: u64 = stdout.trim().parse()?;
-
+    if cfg!(target_os="windows"){
+        println!("{}",tmem);
+        return Ok(tmem/1024)
+    }
     return Ok(tmem);
+
 }
 
 fn fetch_pvt_ip() -> Result<String, Box<dyn std::error::Error>> {
