@@ -22,10 +22,10 @@ fi
 #cargo build --release
 
 curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/releases/ospect
-cargo install --path .
+#cargo install --path .
 
 # Add OSpect to PATH
-export PATH="$HOME/.cargo/bin:$PATH"
+export PATH="./ospect:$PATH"
 
 # Run OSpect help command
 # echo "Running OSpect help command..."

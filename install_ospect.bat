@@ -40,10 +40,10 @@ if %errorlevel% neq 0 (
 ::)
 
 curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/releases/ospect
-call cargo install --path .
+::call cargo install --path .
 
 :: Add OSpect to PATH
-set "PATH=%PATH%;%CD%\target\release"
+set "PATH=%PATH%;%CD%\ospect"
 
 echo Installation complete! You can now use the 'ospect' command.
 pause
