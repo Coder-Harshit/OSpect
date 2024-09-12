@@ -59,3 +59,4 @@ move ospect.exe "%user_bin_dir%"
 setx PATH "%user_bin_dir%;%PATH%"
 
 echo OSpect installation complete for your user!
+echo Restart your terminalfor the changes to take effect.
