@@ -10,7 +10,7 @@ fi
 curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/releases/ospect
 
 # move OSpect to /usr/local/bin for system wide access
-mv ospect $HOME/bin
+mv ospect $HOME/bin/
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     # Linux
     echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
