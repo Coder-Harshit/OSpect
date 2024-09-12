@@ -22,7 +22,7 @@ if ! command -v rustc &> /dev/null; then
 fi
 
 # Download OSpect pre-built binary (if available) or build from source
-if [[ -f "https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/releases/ospect" ]]; then
+if curl --output /dev/null --silent --head --fail "https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/releases/ospect"; then
   # Download pre-built binary (adjust URL if necessary)
   echo "Downloading pre-built OSpect..."
   curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/releases/ospect
