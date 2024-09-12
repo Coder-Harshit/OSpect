@@ -27,14 +27,14 @@
 To simplify the installation process, you can use the provided `install_ospect.sh` script (for Unix-based Systems) or `install_ospect.bat` (for Windows Systems). This script will install Rust, clone the OSpect repository, build the project, and run OSpect along with env. variable additions.
 
 1. **Download and Run the Script**:
-   
+
    [***For `Unix-Based` Systems***]
    ```sh
    curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/install_ospect.sh
    chmod +x install_ospect.sh
-   ./install_ospect.sh
+   sudo ./install_ospect.sh
    ```
-   
+
    [***For `Windows` Systems***]
    ```sh
    curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/install_ospect.bat

@@ -16,36 +16,11 @@ if %errorlevel% neq 0 (
     set "PATH=%PATH%;%USERPROFILE%\.cargo\bin"
 )
 
-:::: Clone OSpect repo if it doesn't exist
-::if exist OSpect (
-::    echo OSpect directory already exists. Skipping clone.
-::) else (
-::    :: Check if git is installed
-::    where git >nul 2>nul
-::    if %errorlevel% neq 0 (
-::        echo git is not installed. Please install git and run this script again.
-::        goto :eof
-::    )
-::    echo Cloning OSpect repository...
-::    git clone https://github.com/Coder-Harshit/OSpect.git
-::)
-::cd OSpect
-
-:: Build & Install
-::echo Building OSpect...
-::call cargo build --release
-::if %errorlevel% neq 0 (
-::    echo Build failed. Please check the error messages above.
-::    goto :eof
-::)
-
 curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/releases/ospect
-::call cargo install --path .
 
-:: Add OSpect to PATH
-set CURRENT_DIR=%CD%
-set "PATH=%CURRENT_DIR%;%PATH%"
-setx PATH "%CURRENT_DIR%;%PATH%"
+:: Move ospect to C:\Program Files
+move ospect "C:\Program Files"
+
 
 echo Installation complete! You can now use the 'ospect' command.
 pause
