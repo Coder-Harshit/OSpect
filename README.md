@@ -5,32 +5,40 @@
 
 <div style="display: flex; align-items: center; justify-content: space-between;">
   <p style="text-align: justify;">
-    OSpect is a powerful and versatile system information utility tool designed to provide comprehensive diagnostics and insights into your system's hardware and software configuration. With OSpect, you can effortlessly gather detailed information about your operating system, hardware components, network status, and more.
+    OSpect is a high-performance versatile system diagnostics and insights tool written in Rust, designed for detailed exploration of operating system configurations, hardware components, and network status. With its focus on speed and security, OSpect is ideal for developers, system administrators, and users who want efficient and in-depth diagnostics.
   </p>
 
   <img src="assets/github/OSpect_github.gif" alt="OSpect Logo" width="200" style="margin-left: 20px;" />
 
 </div>
 
-## Features
-
-- **Detailed OS Information**: Retrieve the name, version, and kernel details of your operating system.
-- **Hardware Insights**: Get in-depth details about your CPU, RAM, storage, and other hardware components.
-- **Network Statistics**: Monitor network interfaces, IP addresses, and connection statuses.
-- **Customizable Output**: Use flags to customize the level of detail and specific information you want to display.
+## Key Features
+- **Blazing-fast Execution**: Thanks to Rust’s zero-cost abstractions and memory safety.
+- **Detailed System Diagnostics**: Get comprehensive OS, hardware, and network information.
+- **Customizable**: Fine-tune the output for specific needs using config file.
+- **Cross-Platform Capabilities**: Seamlessly compatible with Linux, Windows, and macOS for a unified experience across all major platforms.
+- **Secure**: No data leakage, with all diagnostics performed locally.
 - **Visual Appeal**: Clean and colorful output designed for readability and ease of use.
 
 ## Installation
 
 ### Automated Install Script
 
-To simplify the installation process, you can use the provided `install_ospect.sh` script. This script will install Rust, clone the OSpect repository, build the project, and run OSpect.
+To simplify the installation process, you can use the provided `install_ospect.sh` script (for Unix-based Systems) or `install_ospect.bat` (for Windows Systems). This script will install Rust, clone the OSpect repository, build the project, and run OSpect along with env. variable additions.
 
 1. **Download and Run the Script**:
+   
+   [***For `Unix-Based` Systems***]
    ```sh
    curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/install_ospect.sh
    chmod +x install_ospect.sh
    ./install_ospect.sh
+   ```
+   
+   [***For `Windows` Systems***]
+   ```sh
+   curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/install_ospect.bat
+   ./install_ospect.bat
    ```
 
 ### Manual Installation
@@ -52,56 +60,67 @@ If you prefer to manually install OSpect, follow these steps:
    ```
 
 ## Usage
+Run OSpect to get a detailed system overview:
 
-OSpect provides various flags to display specific system information. Here are some examples:
+```sh
+ospect
+```
 
-- **Display All Information**:
+**Command-Line Options**
+
+OSpect provides the ability to display specific system information via additional parameters. Here are some examples:
+
+- **Show Basic System Analytics**:
   ```sh
-  ospect all
+  ospect basic
   ```
 
-- **List Available Flags**:
-  ```sh
-  ospect --list
-  ```
-
-- **Show Detailed Hardware Information**:
-  ```sh
-  ospect hardware
-  ```
-
-- **Show Network Information**:
+- **Show Network Analytics**:
   ```sh
   ospect network
   ```
 
-- **Show Detailed OS Information**:
+<!-- - **Show Detailed Hardware Analytics**:
+  ```sh
+  ospect hardware
+  ``` -->
+
+- **Show Detailed OS Analytics**:
   ```sh
   ospect os
   ```
 
-- **Show Version Information**:
+<!-- - **Show Version Information**:
   ```sh
   ospect --version
   ```
 - **Display Help**:
   ```
   ospect --help
-  ```
+  ``` -->
 
-### Available Flags
+## 💡 Configuration
 
-| Flag         | Description                                     |
-|--------------|-------------------------------------------------|
-| `--all`      | Show all available information                  |
-| `--list`     | List all available flags                        |
-| `--hardware` | Show detailed hardware information              |
-| `--network`  | Show network information                        |
-| `--os`       | Show detailed OS information                    |
-| `--version`  | Show version information                        |
-| `--help`     | Display usage information and available flags   |
+You can configure OSpect’s output through environment variables or modify the configuration file (`config.toml`). A sample config file is provided in the repository for demonstration purposes.
 
-## Contributing
+Example `config.toml`:
+
+```toml
+[basic]
+username
+total_memory
+
+[os]
+hostname
+kernel
+
+```
+
+## 🛡️ Security
+
+OSpect is designed with a strong emphasis on security. All diagnostics are run locally, and no external connections are made, ensuring that sensitive data is not exposed.
+
+## 🤝 Contributing
 
 We welcome contributions from the community! If you'd like to contribute to OSpect, please follow these steps:
 
@@ -109,11 +128,11 @@ We welcome contributions from the community! If you'd like to contribute to OSpe
 
 2. **Clone Your Fork**:
    ```sh
-   git clone https://github.com/Coder-Harshit/OSpect.git
+   git clone https://github.com/<your-username>/OSpect.git
    cd OSpect
    ```
 
-3. **Create a Branch**:
+3. **Create a Feature Branch**:
    ```sh
    git checkout -b feature-branch
    ```
@@ -140,5 +159,3 @@ For questions or feedback, please contact [harshitvj07@gmail.com](mailto:harshit
 ---
 
 Thank you for using OSpect! We hope you find it as useful and powerful as we do.
-
-<!-- ![Footer Logo](https://your-footer-logo-url-here.com/logo.png) -->
