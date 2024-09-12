@@ -32,7 +32,7 @@ To simplify the installation process, you can use the provided `install_ospect.s
    ```sh
    curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/install_ospect.sh
    chmod +x install_ospect.sh
-   sudo ./install_ospect.sh
+   ./install_ospect.sh
    ```
 
    [***For `Windows` Systems***]

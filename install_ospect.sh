@@ -10,7 +10,7 @@ fi
 curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/releases/ospect
 
 # move OSpect to /usr/local/bin for system wide access
-mv ospect /usr/local/bin
+sudo mv ospect /usr/local/bin
 
 # Run OSpect help command
 # echo "Running OSpect help command..."
