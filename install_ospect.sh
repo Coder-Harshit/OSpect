@@ -7,19 +7,21 @@ if ! command -v rustc &> /dev/null; then
     source $HOME/.cargo/env
 fi
 
-# Clone the OSpect repository if the directory does not exist
-if [ ! -d "OSpect" ]; then
-    echo "Cloning OSpect repository..."
-    git clone https://github.com/Coder-Harshit/OSpect.git
-else
-    echo "OSpect directory already exists. Skipping clone."
-fi
+## Clone the OSpect repository if the directory does not exist
+#if [ ! -d "OSpect" ]; then
+#    echo "Cloning OSpect repository..."
+#    git clone https://github.com/Coder-Harshit/OSpect.git
+#else
+#    echo "OSpect directory already exists. Skipping clone."
+#fi
 
-cd OSpect
+#cd OSpect
 
 # Build and install OSpect
-echo "Building and installing OSpect..."
-cargo build --release
+#echo "Building and installing OSpect..."
+#cargo build --release
+
+curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/releases/ospect
 cargo install --path .
 
 # Add OSpect to PATH
