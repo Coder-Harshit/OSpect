@@ -1,37 +1,12 @@
-// use colored::*;
-// use clap::Command;
-// use sysinfo::{CpuRefreshKind, RefreshKind, System ,Networks};
-// use whoami;
-// use std::{env, fs};
-// use std::path::PathBuf;
-
-use std::{env, error::Error, fs, process::{exit, Command}};
+use std::{env, error::Error, fs, path::PathBuf, process::{exit, Command}};
 use colored::Colorize;
-// use serde::Deserialize;
-// use toml::Value;
 
-
-// #[derive(Deserialize)]
-// struct Config{
-//     basic: BasicConfig,
-// }
-// #[derive(Deserialize)]
-// struct BasicConfig{
-//     hostname: Vec<String>,
-//     username: Vec<String>,
-//     osname: Vec<String>,
-//     kernel: Vec<String>,
-//     total_memory: Vec<String>,
-// }
-
-
-fn load_config(file_path: &str, flag_type: &str) -> Result<Vec<String>, Box<dyn Error>> {
+fn load_config(file_path: PathBuf, flag_type: &str) -> Result<Vec<String>, Box<dyn Error>> {
     let config_content = fs::read_to_string(file_path)?;
 
     let mut options = Vec::new();
     let mut in_section = false;
     for line in config_content.lines(){
-
         let trimmed_line = line.trim();
         if trimmed_line.is_empty() || trimmed_line.starts_with("#"){continue;}
         if trimmed_line.starts_with("["){
@@ -49,61 +24,7 @@ fn load_config(file_path: &str, flag_type: &str) -> Result<Vec<String>, Box<dyn 
             options.push(trimmed_line.to_string());
         }
     }
-    // println!("{:?}",options);
-
     Ok(options)
-
-    // fn extract_options(section: &Value) -> Vec<String> {
-    //     let mut options = Vec::new();
-    //     if let Some(table) = section.as_table() {
-    //         for (key, _) in table {
-    //             options.push(key.to_string());
-    //         }
-    //     }
-    //     options
-    // }
-    // match flag_type {
-    //     "basic" => {
-    //         if let Some(basic) = value.get("basic"){
-    //             if basic.as_table().is_some() {
-    //                 options.extend(extract_options(basic))
-    //             }
-    //         }else{
-    //             println!("'basic' block missing in config file")
-    //         }
-    //     },
-    //     "network" => {
-    //         if let Some(network) = value.get("network"){
-    //             if network.as_table().is_some() {
-    //                 options.extend(extract_options(network))
-    //             }
-    //         }else{
-    //             println!("'network' block missing in config file")
-    //         }
-    //     },
-    //     "hardware" => {
-    //         if let Some(hardware) = value.get("hardware"){
-    //             if hardware.as_table().is_some() {
-    //                 options.extend(extract_options(hardware))
-    //             }
-    //         }else{
-    //             println!("'hardware' block missing in config file")
-    //         }
-    //     },
-    //     "os" => {
-    //         if let Some(os) = value.get("os"){
-    //             if os.as_table().is_some() {
-    //                 options.extend(extract_options(os))
-    //             }
-    //         }else{
-    //             println!("'os' block missing in config file")
-    //         }
-    //     },
-    //     _ => {
-    //         println!("ERROR");
-    //     },
-    // }
-
 }
 
 
@@ -161,27 +82,46 @@ fn fetch_hostname() -> Result<String, Box<dyn std::error::Error>> {
 }
 
 fn fetch_osname() -> Result<String, Box<dyn std::error::Error>> {
-    let output= Command::new("/bin/bash")
+    let output= if cfg!(target_os="windows"){
+        Command::new("/bin/sh")
         .args(["-c", "/bin/head -n 1 /etc/os-release | awk -F '=' '{print $2}'"])
-        .output()?;
+        .output()?
+    }else{
+        Command::new("/bin/sh")
+        .args(["-c", "/bin/head -n 1 /etc/os-release | awk -F '=' '{print $2}'"])
+        .output()?
+    };
     let osname = String::from_utf8(output.stdout)?;
     let trimmed_osname = osname.trim().trim_matches('"');
     return Ok(trimmed_osname.to_string());
 }
 
 fn fetch_kernel() -> Result<String, Box<dyn std::error::Error>> {
-    let output = Command::new("uname")
-        .arg("-r")
-        .output()?;
+    let output = if cfg!(target_os="windows"){
+        Command::new("powershell")
+        .arg("-Command")
+        .arg("Get-ItemProperty -Path 'HKLM:\\Software\\Microsoft\\Windows NT\\CurrentVersion' | Select-Object -ExpandProperty CurrentVersion")
+        .output()?
+    }else{
+        Command::new("uname")
+            .arg("-r")
+            .output()?
+    };
     let kernel = String::from_utf8(output.stdout)?;
     let kernel = kernel.trim();
     return  Ok(kernel.to_string());
 }
 
 fn fetch_total_mem() -> Result<u64, Box<dyn std::error::Error>>{
-    let tmem = Command::new("/bin/bash")
+    let tmem = if cfg!(target_os="windows"){
+        Command::new("/bin/sh")
         .args(["-c","/bin/cat /proc/meminfo | /bin/grep MemTotal | awk '{print $2}'"])
-        .output()?;
+        .output()?
+    } else{
+        Command::new("/bin/sh")
+        .args(["-c","/bin/cat /proc/meminfo | /bin/grep MemTotal | awk '{print $2}'"])
+        .output()?
+    };
     let stdout = String::from_utf8(tmem.stdout)?;
     let tmem: u64 = stdout.trim().parse()?;
 
@@ -189,7 +129,7 @@ fn fetch_total_mem() -> Result<u64, Box<dyn std::error::Error>>{
 }
 
 fn fetch_pvt_ip() -> Result<String, Box<dyn std::error::Error>> {
-    let output = Command::new("/bin/bash")
+    let output = Command::new("/bin/sh")
         .args(["-c","ip -4 addr show | awk '/inet / && !/127.0.0.1/ {split($2, a, \"/\"); print a[1]}'"])
         .output()?;
     let pvt_ip = String::from_utf8(output.stdout)?;
@@ -212,7 +152,7 @@ fn fetch_pub_ip() -> Result<String, Box<dyn std::error::Error>> {
 }
 
 fn fetch_mac_addr() -> Result<String, Box<dyn std::error::Error>> {
-    let output = Command::new("/bin/bash")
+    let output = Command::new("/bin/sh")
         .args(["-c","ip link show | awk '/ether/ {print $2}'"])
         .output()?;
     let mac_addr = String::from_utf8(output.stdout)?;
@@ -335,7 +275,7 @@ fn fetching_value(options:Vec<String>){
                     Ok(mac_addr) => {
                         println!("{}: {}", "MAC Address".blue(), mac_addr);
                     }
-                    Err(err) => println!("{}: {}", "Error".red(), err),
+                    Err(err) => println!("{}: {}", "Error   ".red(), err),
                 }
 
             },
@@ -354,8 +294,12 @@ fn fetching_value(options:Vec<String>){
 
 fn main() {
 
-    let home = env::var("HOME").expect("HOME variable not set");
-    let config_path = format!("{home}/.config/ospect/config.toml") ;
+    let home_dir = dirs::home_dir().expect("Failed to locate HOME dir");
+    let config_path = if cfg!(target_os = "windows"){
+        home_dir.join("Appdata\\Roaming\\ospect\\config.toml")
+    }else{
+        home_dir.join(".config/ospect/config.toml")
+    };
     let args:Vec<String> = env::args().collect();
 
     // for itr in &args {
@@ -365,7 +309,7 @@ fn main() {
     match args.len() {
         1 => {
             // default option to run
-            let options = load_config(&config_path,"basic").expect("Failed to load config");
+            let options = load_config(config_path,"basic").expect("Failed to load config");
             // print_basic_info(options);
             // println!("{:?}",options);
 
@@ -374,7 +318,7 @@ fn main() {
 
         },
         2 => {
-            let options = load_config(&config_path,&args[1]).expect("Failed to load config");
+            let options = load_config(config_path,&args[1]).expect("Failed to load config");
             // specialized output
             match args[1].to_ascii_lowercase().as_str(){
                 "network"=> {
