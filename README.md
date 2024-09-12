@@ -40,6 +40,7 @@ To simplify the installation process, you can use the provided `install_ospect.s
    curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/install_ospect.bat
    ./install_ospect.bat
    ```
+   > Manual intervention may be involved in case of windows systems
 
 ### Manual Installation
 
