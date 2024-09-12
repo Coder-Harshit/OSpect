@@ -43,7 +43,9 @@ curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/releases/osp
 ::call cargo install --path .
 
 :: Add OSpect to PATH
-set "PATH=%PATH%;%CD%\ospect"
+set CURRENT_DIR=%CD%
+set "PATH=%CURRENT_DIR%;%PATH%"
+setx PATH "%CURRENT_DIR%;%PATH%"
 
 echo Installation complete! You can now use the 'ospect' command.
 pause

@@ -24,8 +24,28 @@ fi
 curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/releases/ospect
 #cargo install --path .
 
+chmod +x ospect
+
+
+
 # Add OSpect to PATH
-export PATH="./ospect:$PATH"
+# Get the current working directory
+CURRENT_DIR=$(pwd)
+
+export PATH="$CURRENT_DIR:$PATH"
+# Determine the OS
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    # Linux
+    echo 'export PATH="$CURRENT_DIR:$PATH"' >> ~/.bashrc
+    echo "OSpect added to PATH in ~/.bashrc"
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    echo 'export PATH="$CURRENT_DIR:$PATH"' >> ~/.bash_profile
+    echo "OSpect added to PATH in ~/.bash_profile"
+else
+    echo "Unsupported operating system: $OSTYPE"
+    exit 1
+fi
 
 # Run OSpect help command
 # echo "Running OSpect help command..."
