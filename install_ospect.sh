@@ -10,8 +10,19 @@ fi
 curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/releases/ospect
 
 # move OSpect to /usr/local/bin for system wide access
-sudo mv ospect /usr/local/bin
-
+mv ospect $HOME/bin
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    # Linux
+    echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
+    # echo "OSpect added to PATH in ~/.bashrc"
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bash_profile
+    # echo "OSpect added to PATH in ~/.bash_profile"
+else
+    echo "Unsupported operating system: $OSTYPE"
+    exit 1
+fi
 # Run OSpect help command
 # echo "Running OSpect help command..."
 # ospect --help
