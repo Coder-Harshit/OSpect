@@ -1,0 +1,32 @@
+# Configuration for OSpect
+# Uncomment the options you want to enable under each section.
+
+# username
+# hostname
+# osname
+# kernel
+# total_memory
+# ip
+# mac
+# interfaces
+# active_connections
+# cpu
+# gpu
+# disk
+
+[basic]
+username
+osname
+
+[network]
+hostname
+ip
+mac
+
+
+[hardware]
+cpu
+disk
+
+[os]
+kernel
