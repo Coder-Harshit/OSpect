@@ -6,5 +6,5 @@ authors = ["HARSHIT VIJAY"]
 
 [dependencies]
 colored = "2.1.0"
-serde = { version = "1.0.210", features = ["derive"] }
+dirs = "5.0.1"
 toml = "0.8.19"
