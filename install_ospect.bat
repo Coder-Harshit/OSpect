@@ -10,20 +10,21 @@ echo Continue? (y/N)
 
 set /p confirmation=
 
-if not "%confirmation%" == "y" && not "%confirmation%" == "Y" (
+if /I not "%confirmation%" == "y" (
     echo Aborting installation.
     goto :EOF
 )
 
 :: Check for Rust and Cargo
-if not exist "C:\Users\%USERNAME%\AppData\Local\Programs\rust\bin\rustc.exe" (
+if not exist "%USERPROFILE%\.cargo\bin\rustc.exe" (
     echo Rust is not installed. Installing Rust...
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 )
 
 :: Download OSpect pre-built binary (if available) or build from source
-if exist "https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/releases/ospect.exe" (
-    :: Download pre-built binary (adjust URL if necessary)
+echo Checking for pre-built OSpect binary...
+curl --head --silent --fail https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/releases/ospect.exe >nul
+if %errorlevel% == 0 (
     echo Downloading pre-built OSpect...
     curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/releases/ospect.exe
 ) else (
@@ -54,9 +55,7 @@ if not exist "%user_bin_dir%" (
 )
 move ospect.exe "%user_bin_dir%"
 
-
 :: Update PATH variable using Windows environment variables
-setx /M PATH "%user_bin_dir%;%PATH%"
+setx PATH "%user_bin_dir%;%PATH%"
 
 echo OSpect installation complete for your user!
-echo Restart your terminal or run 'setx /M PATH "%user_bin_dir%;%PATH%"' to update the PATH variable immediately.
