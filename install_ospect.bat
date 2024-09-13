@@ -18,7 +18,9 @@ if /I not "%confirmation%" == "y" (
 :: Check for Rust and Cargo
 if not exist "%USERPROFILE%\.cargo\bin\rustc.exe" (
     echo Rust is not installed. Installing Rust...
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    curl -sSf https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -o rustup-init.exe
+    rustup-init.exe -y
+    del rustup-init.exe
 )
 
 :: Download OSpect pre-built binary (if available) or build from source
@@ -27,6 +29,7 @@ curl --head --silent --fail https://raw.githubusercontent.com/Coder-Harshit/OSpe
 if %errorlevel% == 0 (
     echo Downloading pre-built OSpect...
     curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/releases/ospect.exe
+    curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/sample_config.toml
 ) else (
     echo Pre-built binary not found. Building OSpect from source...
     :: Assuming your OSpect source code is in the current directory
@@ -49,14 +52,31 @@ if not exist ospect.exe (
 :: Install OSpect for the user
 echo Adding OSpect to your user's PATH...
 set user_bin_dir=%USERPROFILE%\bin
+set config_dir=%USERPROFILE%\Appdata\Roaming\ospect
 if not exist "%user_bin_dir%" (
     echo Creating %user_bin_dir% directory...
     mkdir "%user_bin_dir%"
 )
 move ospect.exe "%user_bin_dir%"
+ren sample_config.toml config.toml
+if not exist "%config_dir%" (
+    echo Creating %config_dir% directory...
+    mkdir "%config_dir%"
+)
+move config.toml "%config_dir%"
 
 :: Update PATH variable using Windows environment variables
-setx PATH "%user_bin_dir%;%PATH%"
+for /f "tokens=1,* delims=;" %%a in ("%PATH%") do (
+    if "%%a" neq "%user_bin_dir%" (
+        setx PATH "%user_bin_dir%;%PATH%"
+    )
+)
+
+:: Cleanup
+cd ..
+if exist OSpect (
+    rmdir /s /q OSpect
+)
 
 echo OSpect installation complete for your user!
 echo Restart your terminalfor the changes to take effect.

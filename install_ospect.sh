@@ -26,6 +26,7 @@ if curl --output /dev/null --silent --head --fail "https://raw.githubusercontent
   # Download pre-built binary (adjust URL if necessary)
   echo "Downloading pre-built OSpect..."
   curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/releases/ospect
+  curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/sample_config.toml
 else
   echo "Pre-built binary not found. Building OSpect from source..."
   # Assuming your OSpect source code is in the current directory
@@ -47,11 +48,18 @@ fi
 # Install OSpect for the user
 echo "Adding OSpect to your user's PATH..."
 user_bin_dir="$HOME/bin"
+ospect_config_dir="$HOME/.config/ospect"
 if [[ ! -d "$user_bin_dir" ]]; then
   echo "Creating $user_bin_dir directory..."
   mkdir -p "$user_bin_dir"
 fi
 mv ospect "$user_bin_dir"
+
+if [[ ! -d "$ospect_config_dir" ]]; then
+  echo "Creating $ospect_config_dir directory..."
+  mkdir -p "$ospect_config_dir"
+fi
+mv sample_config.toml "$ospect_config_dir/config.toml"
 
 # Update shell configuration file (handle different shells gracefully)
 shell_config_file=""
@@ -59,18 +67,38 @@ if [[ -f ~/.bashrc ]]; then
   shell_config_file=~/.bashrc
 elif [[ -f ~/.zshrc ]]; then
   shell_config_file=~/.zshrc
-  # Add line for zsh (adjust if necessary)
-  echo 'export PATH="$HOME/bin:$PATH"' >> "$shell_config_file"
 else
   echo "Warning: Could not find a compatible shell configuration file."
   echo "You may need to manually add 'export PATH=\"$HOME/bin:$PATH\"' to your shell configuration file (e.g., ~/.bashrc or ~/.zshrc)."
 fi
+
+
+# Add PATH to the shell configuration file if not already present
+if [[ -n "$shell_config_file" ]]; then
+  if ! grep -q 'export PATH="$HOME/bin:$PATH"' "$shell_config_file"; then
+    echo 'export PATH="$HOME/bin:$PATH"' >> "$shell_config_file"
+    echo "Updated $shell_config_file to include $HOME/bin in PATH."
+    # Source the shell configuration file
+    echo "Sourcing $shell_config_file..."
+    source "$shell_config_file"
+  else
+    echo "$shell_config_file already includes $HOME/bin in PATH."
+  fi
+fi
+
 
 # Source the shell configuration file (if applicable)
 if [[ ! -z "$shell_config_file" ]]; then
   echo "Sourcing $shell_config_file..."
   source "$shell_config_file"
 fi
+
+# Cleanup
+cd ..
+if [[ -d OSpect ]]; then
+  rm -rf OSpect
+fi
+
 
 echo "OSpect installation complete for your user!"
 echo "Restart your terminal or run 'source ~/.bashrc' (or your shell's equivalent) for the changes to take effect."
