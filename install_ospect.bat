@@ -15,14 +15,6 @@ if /I not "%confirmation%" == "y" (
     goto :EOF
 )
 
-:: Check for Rust and Cargo
-if not exist "%USERPROFILE%\.cargo\bin\rustc.exe" (
-    echo Rust is not installed. Installing Rust...
-    curl -sSf https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -o rustup-init.exe
-    rustup-init.exe -y
-    del rustup-init.exe
-)
-
 :: Download OSpect pre-built binary (if available) or build from source
 echo Checking for pre-built OSpect binary...
 curl --head --silent --fail https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/releases/ospect.exe >nul
@@ -32,6 +24,13 @@ if %errorlevel% == 0 (
     curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/sample_config.toml
 ) else (
     echo Pre-built binary not found. Building OSpect from source...
+    :: Check for Rust and Cargo
+    if not exist "%USERPROFILE%\.cargo\bin\rustc.exe" (
+        echo Rust is not installed. Installing Rust...
+        curl -sSf https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -o rustup-init.exe
+        rustup-init.exe -y
+        del rustup-init.exe
+    )
     :: Assuming your OSpect source code is in the current directory
     git clone https://github.com/Coder-Harshit/OSpect.git
     cd OSpect

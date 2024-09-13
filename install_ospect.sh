@@ -15,11 +15,6 @@ if [[ ! "$confirmation" =~ ^[Yy]$ ]]; then
   exit 1
 fi
 
-# Check for Rust and Cargo
-if ! command -v rustc &> /dev/null; then
-  echo "Rust is not installed. Installing Rust..."
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-fi
 
 # Download OSpect pre-built binary (if available) or build from source
 if curl --output /dev/null --silent --head --fail "https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/releases/ospect"; then
@@ -29,6 +24,11 @@ if curl --output /dev/null --silent --head --fail "https://raw.githubusercontent
   curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/sample_config.toml
 else
   echo "Pre-built binary not found. Building OSpect from source..."
+  # Check for Rust and Cargo
+  if ! command -v rustc &> /dev/null; then
+    echo "Rust is not installed. Installing Rust..."
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+  fi
   # Assuming your OSpect source code is in the current directory
   git clone https://github.com/Coder-Harshit/OSpect.git
   cd OSpect
