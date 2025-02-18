@@ -27,7 +27,7 @@ jobs:
       if: matrix.os != 'windows-latest'
       run: |
         chmod +x install_ospect.sh
-        ./install_ospect.sh
+        echo "y" | ./install_ospect.sh
         export PATH="$HOME/bin:$PATH"
         ospect --version
 
@@ -35,5 +35,5 @@ jobs:
       if: matrix.os == 'windows-latest'
       shell: cmd
       run: |
-        call .\ospect_install.bat
+        echo.exe "y" | call .\ospect_install.bat
         ospect --version
