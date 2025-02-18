@@ -1,0 +1,33 @@
+name: Rust CI Check
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        # os: ['ubuntu-latest','windows-latest','macos-latest']
+        os: ['ubuntu-latest']
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build
+      run: cargo build --verbose
+
+    - name: Run install_ospect.sh on Unix
+      if: matrix.os != 'windows-latest'
+      run: chmod +x install_ospect.sh && (echo 'y' | ./install_ospect.sh)
+
+    - name: Run install_ospect.bat on Windows
+      if: matrix.os == 'windows-latest'
+      run: ./install_ospect.bat

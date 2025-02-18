@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script name for clarity (optional)
+# Script name for clarity
 SCRIPT_NAME="ospect_install.sh"
 
 # User confirmation before making system-wide changes
@@ -16,9 +16,9 @@ if [[ ! "$confirmation" =~ ^[Yy]$ ]]; then
 fi
 
 
-# Download OSpect pre-built binary (if available) or build from source
+# Download OSpect pre-built binary or build from source (if pre-built binary not available)
 if curl --output /dev/null --silent --head --fail "https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/releases/ospect"; then
-  # Download pre-built binary (adjust URL if necessary)
+  # Download pre-built binary
   echo "Downloading pre-built OSpect..."
   curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/releases/ospect
   curl -O https://raw.githubusercontent.com/Coder-Harshit/OSpect/main/sample_config.toml
@@ -29,7 +29,6 @@ else
     echo "Rust is not installed. Installing Rust..."
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
   fi
-  # Assuming your OSpect source code is in the current directory
   git clone https://github.com/Coder-Harshit/OSpect.git
   cd OSpect
   cargo build --release
@@ -101,4 +100,9 @@ fi
 
 
 echo "OSpect installation complete for your user!"
-echo "Restart your terminal or run 'source ~/.bashrc' (or your shell's equivalent) for the changes to take effect."
+
+# manually sourcing the terminal config file
+source $shell_config_file
+
+# executing
+ospect
