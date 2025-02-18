@@ -18,7 +18,7 @@ jobs:
         os: ['ubuntu-latest', 'windows-latest']
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v2
 
     - name: Build
       run: cargo build --verbose
@@ -35,5 +35,5 @@ jobs:
       if: matrix.os == 'windows-latest'
       shell: cmd
       run: |
-        echo.exe "y" | call .\ospect_install.bat
+        echo.exe "y" | call .\install_ospect.bat
         ospect --version
