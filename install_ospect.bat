@@ -64,12 +64,12 @@ if not exist "%config_dir%" (
 )
 move /Y config.toml "%config_dir%"
 
-:: Update PATH variable using Windows environment variables
-for /f "tokens=1,* delims=;" %%a in ("%PATH%") do (
-    if "%%a" neq "%user_bin_dir%" (
-        setx PATH "%user_bin_dir%;%PATH%"
-    )
-)
+@REM :: Update PATH variable using Windows environment variables
+@REM for /f "tokens=1,* delims=;" %%a in ("%PATH%") do (
+@REM     if "%%a" neq "%user_bin_dir%" (
+@REM         setx PATH "%user_bin_dir%;%PATH%"
+@REM     )
+@REM )
 
 :: Cleanup
 cd ..
