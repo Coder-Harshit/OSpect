@@ -78,3 +78,5 @@ if exist OSpect (
 )
 
 echo OSpect installation complete for your user!
+
+ospect.exe
