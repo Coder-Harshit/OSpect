@@ -26,7 +26,11 @@ jobs:
 
     - name: Run install_ospect.sh on Unix
       if: matrix.os != 'windows-latest'
-      run: chmod +x install_ospect.sh && (echo 'y' | ./install_ospect.sh) && ospect
+      run: |
+        chmod +x install_ospect.sh
+        echo 'y' | ./install_ospect.sh
+        echo "$HOME/bin" >> $GITHUB_PATH
+        ospect
 
     - name: Run install_ospect.bat on Windows
       if: matrix.os == 'windows-latest'
