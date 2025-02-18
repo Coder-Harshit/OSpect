@@ -78,5 +78,4 @@ if exist OSpect (
 )
 
 echo OSpect installation complete for your user!
-
-ospect.exe
+%user_bin_dir | Out-File -FilePath "$env:GITHUB_PATH" -Append
