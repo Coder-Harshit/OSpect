@@ -35,5 +35,5 @@ jobs:
       if: matrix.os == 'windows-latest'
       shell: cmd
       run: |
-        echo.exe "y" | call .\install_ospect.bat
-        ospect --version
+        call .\install_ospect.bat
+        ospect.exe --version

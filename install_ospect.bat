@@ -8,7 +8,7 @@ set SCRIPT_NAME=ospect_install.bat
 if defined GITHUB_ACTIONS (
     set CI_MODE=1
     echo Running in GitHub Actions environment
-    set confirmation=y
+    set confirmation="y"
 ) else (
     set CI_MODE=0
     :: User confirmation before making changes
