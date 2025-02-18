@@ -1,6 +1,6 @@
 @echo off
 
-:: Script name for clarity (optional)
+:: Script name for clarity
 set SCRIPT_NAME=ospect_install.bat
 
 :: User confirmation before making system-wide changes
@@ -56,13 +56,13 @@ if not exist "%user_bin_dir%" (
     echo Creating %user_bin_dir% directory...
     mkdir "%user_bin_dir%"
 )
-move ospect.exe "%user_bin_dir%"
+move /Y ospect.exe "%user_bin_dir%"
 ren sample_config.toml config.toml
 if not exist "%config_dir%" (
     echo Creating %config_dir% directory...
     mkdir "%config_dir%"
 )
-move config.toml "%config_dir%"
+move /Y config.toml "%config_dir%"
 
 :: Update PATH variable using Windows environment variables
 for /f "tokens=1,* delims=;" %%a in ("%PATH%") do (
@@ -78,6 +78,10 @@ if exist OSpect (
 )
 
 echo OSpect installation complete for your user!
-%user_bin_dir | Out-File -FilePath "$env:GITHUB_PATH" -Append
+
+:: For GitHub Actions, update the PATH for subsequent steps
+if defined GITHUB_PATH (
+    echo %user_bin_dir%>> %GITHUB_PATH%
+)
 
 ospect.exe
