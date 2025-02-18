@@ -78,4 +78,3 @@ if exist OSpect (
 )
 
 echo OSpect installation complete for your user!
-setx PATH "%USERPROFILE%\bin;%PATH%"
