@@ -78,4 +78,4 @@ if exist OSpect (
 )
 
 echo OSpect installation complete for your user!
-echo Restart your terminalfor the changes to take effect.
+@REM echo Restart your terminalfor the changes to take effect.
