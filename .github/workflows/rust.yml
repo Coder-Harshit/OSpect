@@ -2,7 +2,7 @@ name: Rust CI Check
 
 on:
   push:
-    branches: [ "main", "development" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        os: ['ubuntu-latest', 'windows-latest']
+        os: ['ubuntu-latest']
 
     steps:
     - uses: actions/checkout@v2
@@ -23,17 +23,17 @@ jobs:
     - name: Build
       run: cargo build --verbose
 
-    # - name: Run install_ospect.sh on Unix
-    #   if: matrix.os != 'windows-latest'
-    #   run: |
-    #     chmod +x install_ospect.sh
-    #     echo "y" | ./install_ospect.sh
-    #     export PATH="$HOME/bin:$PATH"
-    #     ospect --version
+    - name: Run install_ospect.sh on Unix
+      if: matrix.os != 'windows-latest'
+      run: |
+        chmod +x install_ospect.sh
+        echo "y" | ./install_ospect.sh
+        export PATH="$HOME/bin:$PATH"
+        ospect --version
 
     - name: Run install_ospect.bat on Windows
       if: matrix.os == 'windows-latest'
       shell: cmd
       run: |
-        call .\install_ospect.bat
+        echo.exe "y" | call .\install_ospect.bat
         ospect.exe --version
