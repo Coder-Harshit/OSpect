@@ -102,7 +102,5 @@ fi
 echo "OSpect installation complete for your user!"
 
 # manually sourcing the terminal config file
+echo $shell_config_file
 source $shell_config_file
-
-# executing
-ospect
